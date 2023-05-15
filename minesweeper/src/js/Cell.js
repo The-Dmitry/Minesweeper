@@ -1,6 +1,8 @@
 import BaseComponent from './BaseComponent.js';
 
 export default class Cell extends BaseComponent {
+  isFlag = false;
+
   constructor({
     tagName, classNames, textContent, attribute, parentNode,
   }, id, bomb = false) {
@@ -16,7 +18,21 @@ export default class Cell extends BaseComponent {
   }
 
   isBomb() {
-    // const cell = this;
     return this.bomb;
+  }
+
+  setTheFlag() {
+    this.isFlag = !this.isFlag;
+    this.getNode().classList.toggle('flag');
+  }
+
+  boom() {
+    this.getNode().textContent = 'X';
+    this.getNode().disabled = true;
+  }
+
+  notBoom(count) {
+    this.getNode().textContent = `${count}`;
+    this.getNode().disabled = true;
   }
 }

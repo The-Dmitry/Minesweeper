@@ -4,15 +4,19 @@ import Cell from './Cell.js';
 export default class Playground extends BaseComponent {
   #cellsList = [];
 
+  #cellsCount = 0;
+
+  openedCells = 0;
+
   #bombsList = [];
 
   #bombsCount = 0;
 
   #columns = 0;
 
-  #cellsCount = 0;
-
   #isGameStarted = false;
+
+  #isLoose = false;
 
   constructor({
     tagName, classNames, textContent, attribute, parentNode,
@@ -81,19 +85,23 @@ export default class Playground extends BaseComponent {
     if (!this.#isGameStarted) {
       this.#isGameStarted = true;
       this.defineBombs(+x, +y);
+      console.log(this.#cellsList);
     }
     if (!this.isValid(x, y)) { return; }
     const cell = this.#cellsList[x][y];
-    if (cell.getNode().disabled) { return; }
+    if (cell.getNode().disabled || cell.isFlag) { return; }
     if (cell.isBomb()) {
-      cell.getNode().textContent = 'X';
+      cell.boom();
+      // this.#isGameStarted = false;
+      this.#isLoose = true;
       return;
     }
     cell.getNode().disabled = true;
+    this.openedCells += 1;
 
     const bombCount = this.checkAround(x, y);
     if (bombCount > 0) {
-      cell.getNode().textContent = bombCount;
+      cell.notBoom(bombCount);
       return;
     }
 
@@ -124,6 +132,22 @@ export default class Playground extends BaseComponent {
     const row = this.#cellsList.length - 1;
     const column = this.#cellsList[0].length - 1;
     return (x >= 0 && x <= row) && (y >= 0 && y <= column);
+  }
+
+  isWon() {
+    return this.#cellsCount - this.openedCells === this.#bombsCount;
+  }
+
+  get isLoose() {
+    return this.#isLoose;
+  }
+
+  setTheFlag(x, y) {
+    this.#cellsList[x][y].setTheFlag();
+  }
+
+  get isGameStarted() {
+    return this.#isGameStarted;
   }
 
   set cellsList(array) {

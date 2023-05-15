@@ -1,16 +1,33 @@
 body {
   background-color: rgb(69, 114, 116);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
 }
 
 .playground {
+  order: 2;
   max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  // margin: 0 auto;
   background-color: cornflowerblue;
   display: grid;
-  grid-template-columns: repeat(30, 1fr);
+  grid-template-columns: repeat(10, 1fr);
 }
 
 .cell {
   aspect-ratio: 1 / 1;
-  font-size: 90%;
+  font-size: 150%;
+}
+
+.flag {
+  background-color: red;
+}
+
+.control {
+  order: 1;
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
 }
