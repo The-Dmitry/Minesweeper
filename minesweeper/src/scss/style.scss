@@ -1,0 +1,16 @@
+body {
+  background-color: rgb(69, 114, 116);
+}
+
+.playground {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: cornflowerblue;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+}
+
+.cell {
+  aspect-ratio: 1 / 1;
+  font-size: 40px;
+}

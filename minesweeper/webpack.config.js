@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-module.exports = {
+module.exports = ({ dev }) => ({
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -13,8 +13,8 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: 'source-map',
-  mode: 'development',
+  devtool: dev ? 'inline-source-map' : false,
+  mode: dev ? 'development' : 'production',
   module: {
     rules: [
       {
@@ -40,7 +40,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({ /* title: 'Base', */ template: './src/index.html', filename: 'index.html', minify: false }),
+    new HtmlWebpackPlugin({ /* title: 'Base', */ template: './src/index.html', filename: 'index.html', minify: dev ? false : true }),
     new MiniCssExtractPlugin({ /* filename: '[name].[contenthash].css' */ }),
   ],
   devServer: {
@@ -49,4 +49,4 @@ module.exports = {
     port: 8080,
     static: './dist',
   },
-};
+});

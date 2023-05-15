@@ -5,7 +5,7 @@
   "main": "webpack.config.js",
   "scripts": {
     "build": "webpack",
-    "dev": "webpack serve",
+    "dev": "webpack serve --env dev",
     "lint": "eslint --fix --ext .js,.jsx ."
   },
   "keywords": [],
