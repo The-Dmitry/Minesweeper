@@ -7,10 +7,10 @@ body {
   margin: 0 auto;
   background-color: cornflowerblue;
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(30, 1fr);
 }
 
 .cell {
   aspect-ratio: 1 / 1;
-  font-size: 40px;
+  font-size: 90%;
 }

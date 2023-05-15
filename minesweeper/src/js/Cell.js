@@ -3,10 +3,11 @@ import BaseComponent from './BaseComponent.js';
 export default class Cell extends BaseComponent {
   constructor({
     tagName, classNames, textContent, attribute, parentNode,
-  }, bomb = false) {
+  }, id, bomb = false) {
     super({
       tagName, classNames, textContent, attribute, parentNode,
     });
+    this.id = id;
     this.bomb = bomb;
   }
 
@@ -15,8 +16,7 @@ export default class Cell extends BaseComponent {
   }
 
   isBomb() {
-    const cell = this.getNode();
-    cell.disabled = true;
+    // const cell = this;
     return this.bomb;
   }
 }

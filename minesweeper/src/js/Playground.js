@@ -6,27 +6,35 @@ export default class Playground extends BaseComponent {
 
   #bombsList = [];
 
+  #bombsCount = 0;
+
+  #columns = 0;
+
   #cellsCount = 0;
 
   #isGameStarted = false;
 
   constructor({
     tagName, classNames, textContent, attribute, parentNode,
-  }, cellsCount = 0) {
+  }, cellsCount, columns, bombsCount) {
     super({
       tagName, classNames, textContent, attribute, parentNode,
     });
     this.#cellsCount = cellsCount;
+    this.#columns = columns;
+    this.#bombsCount = bombsCount;
   }
 
   generatePlayground() {
-    const index = Math.sqrt(this.#cellsCount);
+    const limit = this.#columns;
     const array = [];
-    for (let i = 0; i < index; i += 1) {
+    let id = 0;
+    for (let i = 0; i < this.#cellsCount / limit; i += 1) {
       const temp = [];
-      for (let j = 0; j < index; j += 1) {
-        const cell = new Cell({ tagName: 'button', classNames: ['cell'], attribute: ['data-id', [i, j]] });
+      for (let j = 0; j < limit; j += 1) {
+        const cell = new Cell({ tagName: 'button', classNames: ['cell'], attribute: ['data-id', [i, j]] }, id);
         temp.push(cell);
+        id += 1;
       }
       array.push(temp);
       this.appendChildren(temp);
@@ -34,8 +42,7 @@ export default class Playground extends BaseComponent {
     this.#cellsList = array;
   }
 
-  defineBombs(num) {
-    console.log(num);
+  defineBombs(x, y) {
     const arr = new Array(this.#cellsCount).fill(0).map((el, index) => index);
     for (let i = arr.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -43,13 +50,16 @@ export default class Playground extends BaseComponent {
       arr[i] = arr[j];
       arr[j] = temp;
     }
-    const result = new Set(arr.slice(0, Math.sqrt(this.#cellsCount)));
+    const result = new Set(arr.slice(0, this.#bombsCount));
+    const num = this.#cellsList[x][y].id;
     if (result.has(num)) {
       const basicLength = result.size;
       result.delete(num);
       while (result.size < basicLength) {
-        const test = Math.floor(Math.random() * (this.#cellsCount + 1));
-        result.add(test);
+        const newNum = Math.floor(Math.random() * (this.#bombsCount + 1));
+        if (newNum !== num) {
+          result.add(newNum);
+        }
       }
     }
     this.#bombsList = result;
@@ -57,22 +67,63 @@ export default class Playground extends BaseComponent {
   }
 
   plantBombs() {
-    this.#bombsList.forEach((el) => {
-      const num = el < 10 ? `0${el}` : `${el}`;
-      const [x, y] = num.split('');
-      this.#cellsList[+x][+y].setTheBomb();
-    });
-    // console.log(this.#cellsList);
+    const list = this.#cellsList;
+    for (let i = 0; i < list.length; i += 1) {
+      list[i].forEach((item) => {
+        if (this.#bombsList.has(item.id)) {
+          item.setTheBomb();
+        }
+      });
+    }
   }
 
   checkTheCell(x, y) {
     if (!this.#isGameStarted) {
       this.#isGameStarted = true;
-      const num = +[x, y].join('');
-      this.defineBombs(num);
+      this.defineBombs(+x, +y);
     }
+    if (!this.isValid(x, y)) { return; }
     const cell = this.#cellsList[x][y];
-    cell.isBomb();
+    if (cell.getNode().disabled) { return; }
+    if (cell.isBomb()) {
+      cell.getNode().textContent = 'X';
+      return;
+    }
+    cell.getNode().disabled = true;
+
+    const bombCount = this.checkAround(x, y);
+    if (bombCount > 0) {
+      cell.getNode().textContent = bombCount;
+      return;
+    }
+
+    for (let i = -1; i <= 1; i += 1) {
+      for (let j = -1; j <= 1; j += 1) {
+        if (this.isValid(x + i, y + j)) {
+          this.checkTheCell(x + i, y + j);
+        }
+      }
+    }
+  }
+
+  checkAround(x, y) {
+    let count = 0;
+    for (let i = -1; i <= 1; i += 1) {
+      for (let j = -1; j <= 1; j += 1) {
+        if (this.isValid(x + i, y + j)) {
+          if (this.#cellsList[x + i][y + j].isBomb()) {
+            count += 1;
+          }
+        }
+      }
+    }
+    return count;
+  }
+
+  isValid(x, y) {
+    const row = this.#cellsList.length - 1;
+    const column = this.#cellsList[0].length - 1;
+    return (x >= 0 && x <= row) && (y >= 0 && y <= column);
   }
 
   set cellsList(array) {
