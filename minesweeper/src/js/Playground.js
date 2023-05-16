@@ -138,6 +138,15 @@ export default class Playground extends BaseComponent {
     return this.#cellsCount - this.openedCells === this.#bombsCount;
   }
 
+  startNewGame() {
+    this.removeAllChildren();
+    this.#isGameStarted = false;
+    this.#isLoose = false;
+    this.openedCells = 0;
+    this.generatePlayground();
+    this.getNode().classList.remove('no-events');
+  }
+
   get isLoose() {
     return this.#isLoose;
   }

@@ -12,10 +12,10 @@ playGround.generatePlayground();
 const controlParent = new BaseComponent({ classNames: ['control'], parentNode: body });
 
 const timer = new Timer({ classNames: ['timer'], textContent: '00:00' });
-// timer.startOrEnd(true)
+const newGame = new BaseComponent({ tagName: 'button', classNames: ['new-game'], textContent: 'New Game' });
 const steps = new Steps({ classNames: ['steps'], textContent: 'Steps: 0' });
 
-controlParent.appendChildren([timer, steps]);
+controlParent.appendChildren([timer, newGame, steps]);
 
 playGround.getNode().addEventListener('mousedown', (e) => {
   const [x, y] = e.target.getAttribute('data-id').split(',');
@@ -32,9 +32,24 @@ playGround.getNode().addEventListener('mousedown', (e) => {
   if (playGround.isLoose) {
     timer.isGamePlaying = false;
     console.log('YOU LOOOSER!!!');
+    playGround.getNode().classList.add('no-events');
   }
 });
 
 playGround.getNode().addEventListener('contextmenu', (e) => {
   e.preventDefault();
+});
+
+function startNewGame() {
+  playGround.startNewGame();
+  timer.isGamePlaying = false;
+  timer.seconds = -1;
+  timer.getNode().textContent = '00:00';
+  steps.steps = -1;
+}
+
+controlParent.getNode().addEventListener('mousedown', (e) => {
+  if (e.target === newGame.getNode()) {
+    startNewGame();
+  }
 });

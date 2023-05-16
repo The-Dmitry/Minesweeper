@@ -19,7 +19,9 @@ export default class Control extends BaseComponent {
         this.calcDuration(this.#seconds);
         this.countdown();
       }, 1000);
+      return;
     }
+    this.calcDuration(this.#seconds);
   }
 
   calcDuration(num) {

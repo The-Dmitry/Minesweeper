@@ -32,4 +32,10 @@ export default class BaseComponent {
   destroy() {
     this.#node.remove();
   }
+
+  removeAllChildren() {
+    while (this.#node.lastChild) {
+      this.#node.lastChild.remove();
+    }
+  }
 }
