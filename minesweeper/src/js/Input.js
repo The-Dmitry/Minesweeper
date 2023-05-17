@@ -24,7 +24,7 @@ export default class Input extends BaseComponent {
 
   setMinMax(min, max) {
     const node = this.getNode();
-    node.placeholder = `Max mines: ${max}`;
+    node.placeholder = `Max: ${max}`;
     node.min = min;
     node.max = max;
   }
@@ -35,5 +35,15 @@ export default class Input extends BaseComponent {
 
   getModeObject(num) {
     return this.options.find((mode) => mode.columns === num);
+  }
+
+  selectOption(num) {
+    let node;
+    this.getNode().childNodes.forEach((el) => {
+      if (+el.value === num) {
+        node = el;
+      }
+    });
+    node.selected = true;
   }
 }

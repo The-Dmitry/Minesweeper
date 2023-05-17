@@ -12,4 +12,8 @@ export default class Steps extends BaseComponent {
     this.#steps = num;
     this.updateStep();
   }
+
+  get steps() {
+    return this.#steps;
+  }
 }

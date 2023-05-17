@@ -44,7 +44,6 @@ export default class Playground extends BaseComponent {
       this.appendChildren(temp);
     }
     this.#cellsList = array;
-    console.log(this.#cellsList);
   }
 
   defineBombs(x, y) {
@@ -86,14 +85,12 @@ export default class Playground extends BaseComponent {
     if (!this.#isGameStarted) {
       this.#isGameStarted = true;
       this.defineBombs(+x, +y);
-      console.log(this.#cellsList);
     }
     if (!this.isValid(x, y)) { return; }
     const cell = this.#cellsList[x][y];
     if (cell.getNode().disabled || cell.isFlag) { return; }
     if (cell.isBomb()) {
       cell.boom();
-      // this.#isGameStarted = false;
       this.#isLoose = true;
       return;
     }
@@ -140,7 +137,6 @@ export default class Playground extends BaseComponent {
   }
 
   startNewGame(cells, bombs, columns) {
-    console.log(cells, bombs);
     this.removeAllChildren();
     this.#isGameStarted = false;
     this.#isLoose = false;
@@ -154,7 +150,25 @@ export default class Playground extends BaseComponent {
     this.openedCells = 0;
     this.generatePlayground();
     this.getNode().classList.remove('no-events');
-    console.log(this.#cellsCount, this.#bombsCount);
+  }
+
+  loadGame({ cellsCount, bombsList, columns, stepsArray }) {
+    this.#cellsCount = cellsCount;
+    this.#bombsList = new Set(bombsList);
+    this.#columns = columns;
+    this.#isGameStarted = true;
+    this.generatePlayground();
+    this.plantBombs();
+    this.getNode().classList.remove('size-10', 'size-16', 'size-5');
+    this.getNode().classList.add(`size-${columns}`);
+    // this.#cellsList.forEach((array) => {
+    //   console.log(array);
+    //   this.appendChildren(array)
+    // } );
+    stepsArray.forEach((point) => {
+      this.checkTheCell(...point);
+    });
+
   }
 
   get isLoose() {
@@ -169,12 +183,24 @@ export default class Playground extends BaseComponent {
     return this.#isGameStarted;
   }
 
+  set isGameStarted(bool) {
+    this.#isGameStarted = bool;
+  }
+
   set cellsList(array) {
     this.#cellsList = array;
   }
 
   get cellsList() {
     return this.#cellsList;
+  }
+
+  get bombsList() {
+    return this.#bombsList;
+  }
+
+  set bombsList(list) {
+    this.#bombsList = list;
   }
 
   set cellsCount(cellsCount) {
@@ -184,5 +210,9 @@ export default class Playground extends BaseComponent {
 
   get cellsCount() {
     return this.#cellsCount;
+  }
+
+  get getColumns() {
+    return this.#columns;
   }
 }
