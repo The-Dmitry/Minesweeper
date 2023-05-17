@@ -44,6 +44,7 @@ export default class Playground extends BaseComponent {
       this.appendChildren(temp);
     }
     this.#cellsList = array;
+    console.log(this.#cellsList);
   }
 
   defineBombs(x, y) {
@@ -138,13 +139,22 @@ export default class Playground extends BaseComponent {
     return this.#cellsCount - this.openedCells === this.#bombsCount;
   }
 
-  startNewGame() {
+  startNewGame(cells, bombs, columns) {
+    console.log(cells, bombs);
     this.removeAllChildren();
     this.#isGameStarted = false;
     this.#isLoose = false;
+    if (cells && bombs) {
+      this.#cellsCount = cells;
+      this.#bombsCount = bombs;
+      this.#columns = columns;
+      this.getNode().classList.remove('size-10', 'size-16', 'size-5');
+      this.getNode().classList.add(`size-${columns}`);
+    }
     this.openedCells = 0;
     this.generatePlayground();
     this.getNode().classList.remove('no-events');
+    console.log(this.#cellsCount, this.#bombsCount);
   }
 
   get isLoose() {
