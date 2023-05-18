@@ -26,13 +26,18 @@ export default class Cell extends BaseComponent {
     this.getNode().classList.toggle('flag');
   }
 
-  boom() {
-    this.getNode().textContent = 'X';
-    this.getNode().disabled = true;
+  boom(className) {
+    this.getNode().classList.remove('flag');
+    this.getNode().classList.add(`${className}`);
+    if (className === 'boom') {
+      this.getNode().disabled = true;
+    }
   }
 
   notBoom(count) {
-    this.getNode().textContent = `${count}`;
-    this.getNode().disabled = true;
+    const node = this.getNode();
+    node.textContent = `${count}`;
+    node.disabled = true;
+    node.classList.add(`near-${count}`);
   }
 }

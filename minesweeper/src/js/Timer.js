@@ -39,6 +39,6 @@ export default class Control extends BaseComponent {
   }
 
   get seconds() {
-    return this.#seconds;
+    return this.#seconds + 1;
   }
 }

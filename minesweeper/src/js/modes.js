@@ -5,14 +5,14 @@ const modes = [
     columns: 10,
   },
   {
-    title: '16x16',
-    totalCells: 256,
-    columns: 16,
+    title: '15x15',
+    totalCells: 225,
+    columns: 15,
   },
   {
-    title: '5x5',
-    totalCells: 25,
-    columns: 5,
+    title: '25x25',
+    totalCells: 625,
+    columns: 25,
   },
 ];
 
