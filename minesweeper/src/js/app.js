@@ -9,7 +9,9 @@ import modes from './modes.js';
 let stepsArray = [];
 let flagArray = [];
 let resultArray = [];
+let isDark = JSON.parse(localStorage.getItem('theme'));
 const { body } = document;
+// body.classList.add('light')
 const playGround = new Playground({ classNames: ['playground', 'size-10'], parentNode: body }, 100, 10, 10);
 
 
@@ -33,12 +35,13 @@ const mineCount = new Input({
 });
 const flagCount = new Flag({ classNames: ['flag-count'], textContent: 'Flags / Mines: 0' })
 mineCount.setMinMax(10, 99);
-
-controlParent.appendChildren([timer, newGame, steps, modeSelect, mineCount, modalButton, flagCount]);
+const theme = new BaseComponent({ tagName: 'button', classNames: ['theme'] });
+controlParent.appendChildren([timer, newGame, steps, modeSelect, mineCount, modalButton, flagCount, theme]);
 
 function startNewGame() {
   const { totalCells, columns } = modeSelect.getModeObject(+modeSelect.getNode().value);
-  const mines = +mineCount.getNode().value || 10;
+  const count = +mineCount.getNode().value;
+  const mines = count > 9 ? count : 10;
   mineCount.getNode().value = mines;
   playGround.startNewGame(totalCells, mines, columns);
   timer.isGamePlaying = false;
@@ -49,6 +52,17 @@ function startNewGame() {
   steps.steps = -1;
   stepsArray = [];
   flagArray = [];
+}
+
+
+function handleDarkMode() {
+  if (isDark) {
+    body.classList.add('dark');
+    theme.getNode().classList.remove('sun');
+    return;
+  }
+  body.classList.remove('dark');
+  theme.getNode().classList.add('sun')
 }
 
 function stopTheGame() {
@@ -87,12 +101,13 @@ function loadGame() {
   if (list) {
     resultArray = JSON.parse(list);
   }
+  handleDarkMode();
   showResultFromLs()
   if (data) {
     const obj = JSON.parse(data);
     playGround.loadGame(obj);
-    timer.seconds = obj.timer;
-    timer.calcDuration(obj.timer);
+    timer.seconds = obj.timer - 1;
+    timer.calcDuration(obj.timer - 1);
     stepsArray = obj.stepsArray;
     flagArray = obj.flagArray;
     steps.steps = obj.steps - 1;
@@ -157,7 +172,7 @@ function findRepeatedFlag(array, xy) {
 function openTheCell(e) {
   const { target } = e;
   if (!target.matches('.cell')) { return; }
-  const [x, y] = target.getAttribute('data-id').split(',');
+  const [x, y] = target.getAttribute('x-y').split(',');
   if (e.button === 2) {
     if (target.matches('.flag')) {
       flagCount.changeCountFlag(1);
@@ -206,6 +221,8 @@ function chooseMode(e) {
   }
 }
 
+
+
 modalButton.getNode().onclick = handleModal;
 closeModal.getNode().onclick = handleModal;
 
@@ -218,14 +235,20 @@ mineCount.getNode().addEventListener('input', (e) => {
   if (+node.value > node.max) {
     node.value = node.max;
   }
-  if (+node.value < node.min) {
-    node.value = node.min;
-  }
+  // if (+node.value < node.min) {
+  //   node.value = node.min;
+  // }
 });
 
 playGround.getNode().addEventListener('contextmenu', (e) => {
   e.preventDefault();
 });
+
+theme.getNode().addEventListener('mousedown', () => {
+  isDark = !isDark;
+  handleDarkMode();
+  localStorage.setItem('theme', isDark);
+})
 
 window.addEventListener('beforeunload', () => {
   saveGame();

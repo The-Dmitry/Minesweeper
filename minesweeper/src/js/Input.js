@@ -46,4 +46,8 @@ export default class Input extends BaseComponent {
     });
     node.selected = true;
   }
+
+  setChecked() {
+    this.getNode().checked = true;
+  }
 }

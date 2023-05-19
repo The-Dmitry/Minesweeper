@@ -36,7 +36,7 @@ export default class Playground extends BaseComponent {
     for (let i = 0; i < this.#cellsCount / limit; i += 1) {
       const temp = [];
       for (let j = 0; j < limit; j += 1) {
-        const cell = new Cell({ tagName: 'button', classNames: ['cell'], attribute: ['data-id', [i, j]] }, id);
+        const cell = new Cell({ tagName: 'button', classNames: ['cell'], attribute: ['x-y', [i, j]] }, id);
         temp.push(cell);
         id += 1;
       }

@@ -1,31 +1,123 @@
 @import './normalize';
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap');
 
 $width: 900px;
+$color: black;
 
 html {
   height: 100%;
 }
 
 body {
-  background-color: #457274;
+  background-color: rgb(34,193,195);
+  background: linear-gradient(66deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 30px;
+  gap: 20px;
   height: 100%;
+  font-family: 'Mukta', sans-serif;
+  transition: background-color linear .3s;
 }
 
 
 .playground {
   order: 2;
   width: 100%;
-  // margin: 0 auto;
   display: grid;
-  // max-width: 700px;
   user-select: none;
   gap: 2px;
-  border: 2px solid #363636;
+  background-color: #939393;
+  -webkit-box-shadow: 4px 4px 8px 4px rgba(34, 60, 80, 0.4);
+  -moz-box-shadow: 4px 4px 8px 4px rgba(34, 60, 80, 0.4);
+  box-shadow: 4px 4px 8px 4px rgba(34, 60, 80, 0.4);
+}
+
+.select-mode {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  text-align: center;
+  border-top-left-radius: 5px;
+}
+
+.mines-count {
+  position: relative;
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  text-align: center;
+}
+
+.new-game {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+}
+
+.theme {
+  grid-column: 4 / 5;
+  grid-row: 2 / 3;
+}
+
+.timer {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+.steps {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.flag-count {
+  grid-column: 3 / 4;
+  grid-row: 2 / 3;
+}
+
+.results {
+  grid-column: 4 / 5;
+  grid-row: 1 / 2;
+  border-top-right-radius: 5px;
+}
+
+.select-mode,
+.mines-count,
+.new-game,
+.results {
+  background-color: #dedef8;
+  border: 1px solid black;
+  border-radius: 5px;
+  transition: background-color linear .3s;
+  cursor: pointer;
+  &:hover {
+    background-color: #f4f4f6;
+  }
+}
+
+.mines-count {
+  cursor: text;
+}
+
+
+.timer,
+.steps,
+.flag-count,
+.theme {
+  align-self: center;
+  justify-self: center;
+  font-family: 'Mukta', sans-serif;
+  text-transform: uppercase;
+}
+
+.theme {
+  cursor: pointer;
+  border: none;
+  width: 30px;
+  height: 30px;
+  background: url(../icons/sun.png) 0 0/ cover no-repeat;
+}
+
+.sun {
+  background: url(../icons/moon.png) 0 0/ cover no-repeat;
 }
 
 .size-10 {
@@ -35,27 +127,28 @@ body {
 
 .size-15 {
   grid-template-columns: repeat(15, 1fr);
-  max-width: 700px;
+  max-width: 600px;
 }
 
 .size-25 {
   grid-template-columns: repeat(25, 1fr);
-  max-width: 800px;
+  max-width: 750px;
 }
 
 .cell {
   appearance: none;
   border: none;
   outline: none;
-  background-color: #b9b9b9;
+  background-color: #f4d33a;
   aspect-ratio: 1 / 1;
   font-size: 150%;
   font-weight: 700;
+  transition: background-color linear .3s;
   -webkit-box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
   -moz-box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
   box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
   &:disabled {
-    background-color: #c6dbff;
+    background-color: #fff2a3;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -73,7 +166,18 @@ body {
   width: 100%;
   max-width: 500px;
   justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 30px);
+  row-gap: 7px;
+  column-gap: 3px;
+  padding: 2px 2px 5px 2px;
+  background-color: #f4d33a;
+  border-radius: 5px;
+  transition: background-color linear .3s;
 }
+
+
 
 
 .no-events-modal,
@@ -144,22 +248,16 @@ body {
   }
 }
 
-.mines-count {
-  width: 16%;
-  position: relative;
-  
-}
-
 .boom {
   background: url(../icons/bomb.png) 0 0 /cover no-repeat;
 }
 
 .not-boom {
-  background: url(../icons/saved-bomb.png) 0 0 /cover no-repeat, #8eff8e;
+  background: url(../icons/saved-bomb.png) 0 0 /cover no-repeat, #4be34b;
 }
 
 .near-1 {
-  color: #0035f4;
+  color: #2a58ff;
 }
 
 .near-2 {
@@ -180,5 +278,37 @@ body {
 .near-5,
 .near-9 {
   color: #eda200;
+}
+
+
+
+
+body.dark {
+  background: rgb(19,62,66);
+  background: linear-gradient(326deg, rgba(19,62,66,1) 0%, rgba(38,38,59,1) 100%);
+
+  .cell {
+    background-color: #a9a9a9;
+    &:disabled {
+      background-color: #090d19;
+    }
+  }
+
+  .playground {
+    background-color: #8b7611;
+  }
+
+  .control {
+    background-color: #3093ab;
+  }
+
+  .not-boom {
+    background: url(../icons/saved-bomb.png) 0 0 /cover no-repeat, #4be34b;
+  }
+
+  .flag {
+
+    background-color: #ffd300;
+  }
 }
 
