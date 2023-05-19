@@ -5,40 +5,43 @@ import Steps from './Steps.js';
 import Input from './Input.js';
 import Flag from './Flag.js';
 import modes from './modes.js';
+import sounds from './sounds.js';
 
 let stepsArray = [];
 let flagArray = [];
 let resultArray = [];
 let isDark = JSON.parse(localStorage.getItem('theme'));
 const { body } = document;
-// body.classList.add('light')
+
+const audio = new Audio();
+audio.volume = 0.5;
+
 const playGround = new Playground({ classNames: ['playground', 'size-10'], parentNode: body }, 100, 10, 10);
-
-
-
 const controlParent = new BaseComponent({ classNames: ['control'], parentNode: body });
-
 const timer = new Timer({ classNames: ['timer'], textContent: '00:00' });
 const newGame = new BaseComponent({ tagName: 'button', classNames: ['new-game'], textContent: 'New Game' });
-const steps = new Steps({ classNames: ['steps'], textContent: 'Steps: 0' });
+const steps = new Steps({ classNames: ['steps'], textContent: 'Moves: 0' });
 const modalButton = new BaseComponent({ tagName: 'button', textContent: 'Results', classNames: ['results'] });
 const modalParent = new BaseComponent({ classNames: ['modal-parent', 'hidden'], parentNode: body });
-const closeModal = new BaseComponent({ classNames: ['cross'], parentNode: modalParent.getNode() });
-const resultTitle = new BaseComponent({ tagName: 'h2', classNames: ['result-title'], textContent: 'Results', parentNode: modalParent.getNode() });
-const resultList = new BaseComponent({ classNames: ['result-list'], parentNode: modalParent.getNode() });
-const modeSelect = new Input({
-  tagName: 'select', classNames: ['select-mode'], options: modes,
-});
-modeSelect.setOptions();
-const mineCount = new Input({
-  tagName: 'input', classNames: ['mines-count'], type: 'number',
-});
-const flagCount = new Flag({ classNames: ['flag-count'], textContent: 'Flags / Mines: 0' })
-mineCount.setMinMax(10, 99);
+const closeModal = new BaseComponent({ classNames: ['cross'] });
+const resultTitle = new BaseComponent({ tagName: 'h2', classNames: ['result-title'], textContent: 'Results' });
+const resultList = new BaseComponent({ classNames: ['result-list'] });
+const modeSelect = new Input({ tagName: 'select', classNames: ['select-mode'], options: modes });
+const mineCount = new Input({ tagName: 'input', classNames: ['mines-count'], type: 'number' });
+const flagCount = new Flag({ classNames: ['flag-count'], textContent: 'Flags / Mines: 0' });
 const theme = new BaseComponent({ tagName: 'button', classNames: ['theme'] });
-controlParent.appendChildren([timer, newGame, steps, modeSelect, mineCount, modalButton, flagCount, theme]);
+const soundSwitch = new BaseComponent({ tagName: 'button', classNames: ['sound-switch'], parentNode: body });
+const message = new BaseComponent({ classNames: ['final-message'] });
+
+controlParent.appendChildren([timer, newGame, steps, modeSelect, mineCount,
+  modalButton, flagCount, theme]);
+modalParent.appendChildren([closeModal, resultTitle, resultList]);
+
+modeSelect.setOptions();
+mineCount.setMinMax(10, 99);
 
 function startNewGame() {
+  message.getNode().remove();
   const { totalCells, columns } = modeSelect.getModeObject(+modeSelect.getNode().value);
   const count = +mineCount.getNode().value;
   const mines = count > 9 ? count : 10;
@@ -54,6 +57,10 @@ function startNewGame() {
   flagArray = [];
 }
 
+function playSound(sound) {
+  audio.src = sound;
+  audio.play();
+}
 
 function handleDarkMode() {
   if (isDark) {
@@ -62,7 +69,7 @@ function handleDarkMode() {
     return;
   }
   body.classList.remove('dark');
-  theme.getNode().classList.add('sun')
+  theme.getNode().classList.add('sun');
 }
 
 function stopTheGame() {
@@ -72,6 +79,7 @@ function stopTheGame() {
 }
 
 function handleModal() {
+  message.getNode().remove();
   modalParent.getNode().classList.toggle('hidden');
   playGround.getNode().classList.toggle('no-events-modal');
   newGame.getNode().classList.toggle('no-events-modal');
@@ -95,6 +103,24 @@ function saveGame() {
   localStorage.removeItem('game');
 }
 
+function showResultFromLs() {
+  resultList.removeAllChildren();
+
+  let resultString = '';
+  if (resultArray.length) {
+    const arr = resultArray.reverse();
+    arr.forEach((res, index) => {
+      const sec = parseInt(res.time % 60, 10).toString().padStart(2, 0);
+      const min = Math.floor(res.time / 60).toString().padStart(2, 0);
+      const string = `<p class="result">${index + 1}. Time: ${min}:${sec}, Steps: ${res.steps}, Mode: ${res.mode}x${res.mode}, Mines: ${res.mines}</p>`;
+      resultString += string;
+    });
+  } else {
+    resultString = '<p class="result">The list of games is empty. Only won games are counted</p>';
+  }
+  resultList.getNode().innerHTML = resultString;
+}
+
 function loadGame() {
   const data = localStorage.getItem('game');
   const list = localStorage.getItem('results');
@@ -102,7 +128,7 @@ function loadGame() {
     resultArray = JSON.parse(list);
   }
   handleDarkMode();
-  showResultFromLs()
+  showResultFromLs();
   if (data) {
     const obj = JSON.parse(data);
     playGround.loadGame(obj);
@@ -115,7 +141,6 @@ function loadGame() {
     flagCount.setFlags = obj.bombsList.length;
     flagCount.changeCountFlag(-flagArray.length);
     modeSelect.selectOption(obj.columns);
-    chooseMode();
     return;
   }
   playGround.generatePlayground();
@@ -123,39 +148,46 @@ function loadGame() {
   flagCount.updateFlags();
 }
 
-loadGame()
-
-function showResultFromLs() {
-  resultList.removeAllChildren();
-
-  let resultString = '';
-  if (resultArray.length) {
-    const arr = resultArray.reverse();
-    arr.forEach((res, index) => {
-      const sec = parseInt(res.time % 60, 10);
-      const min = Math.floor(res.time / 60);
-      const string = `<p class="result">${index + 1}. Time: ${min}:${sec}, Steps: ${res.steps}, Mode: ${res.mode}x${res.mode}, Mines: ${res.mines}</p>`;
-      resultString += string;
-    })
+function showMessage(win, seconds, moves) {
+  if (win) {
+    const sec = parseInt(seconds % 60, 10).toString().padStart(2, 0);
+    const min = Math.floor(seconds / 60).toString().padStart(2, 0);
+    message.getNode().innerHTML = `<p class="message">Hooray! You found all mines in ${min}:${sec} and ${moves} moves!</p>
+                          <button class="close-message">Close</button>`;
   } else {
-    resultString = '<p class="result">The list of games is empty. Only won games are counted</p>';
+    message.getNode().innerHTML = `<p class="message">Game over. Try again</p>
+                          <button class="close-message">Close</button>`;
   }
-  resultList.getNode().innerHTML = resultString;
+  message.getNode().addEventListener('click', () => {
+    message.getNode().remove();
+  });
+  setTimeout(() => {
+    body.append(message.getNode());
+  }, 700);
 }
 
-function showWin() {
-  console.log('YOU WIIIN!!!');
-  const result = {
-    time: timer.seconds,
-    steps: steps.steps,
-    mode: playGround.getColumns,
-    mines: playGround.bombsList.size,
+function showWin(win) {
+  if (win) {
+    const result = {
+      time: timer.seconds,
+      steps: steps.steps,
+      mode: playGround.getColumns,
+      mines: playGround.bombsList.size,
+    };
+    resultArray.push(result);
+    resultArray = resultArray.slice(-10);
+    localStorage.setItem('results', JSON.stringify(resultArray));
+    showResultFromLs();
+    showMessage(win, result.time, result.steps);
+    setTimeout(() => {
+      playSound(sounds.win);
+    }, 700);
+    return;
   }
-  console.log(result);
-  resultArray.push(result);
-  resultArray = resultArray.slice(-10);
-  localStorage.setItem('results', JSON.stringify(resultArray));
-  showResultFromLs()
+  showMessage(win);
+  setTimeout(() => {
+    playSound(sounds.defeat);
+  }, 700);
 }
 
 function findRepeatedFlag(array, xy) {
@@ -176,7 +208,7 @@ function openTheCell(e) {
   if (e.button === 2) {
     if (target.matches('.flag')) {
       flagCount.changeCountFlag(1);
-      const flagIndex = findRepeatedFlag(flagArray, [+x, +y])
+      const flagIndex = findRepeatedFlag(flagArray, [+x, +y]);
       if (flagIndex >= 0) {
         flagArray.splice(flagIndex, 1);
       }
@@ -187,11 +219,11 @@ function openTheCell(e) {
       flagCount.changeCountFlag(-1);
       playGround.setTheFlag(+x, +y);
       flagArray.push([+x, +y]);
-      console.log('pyshed', flagArray);
     }
     return;
   }
   playGround.checkTheCell(+x, +y);
+  playSound(sounds.move);
   if (!target.matches('.flag')) {
     steps.updateStep();
     stepsArray.push([+x, +y]);
@@ -200,28 +232,20 @@ function openTheCell(e) {
   if (playGround.isWon()) {
     playGround.blowUpEverything('not-boom');
     stopTheGame();
-    showWin()
+    showWin(true);
   }
   if (playGround.isLoose) {
     stopTheGame();
+    showWin(false);
     playGround.blowUpEverything('boom');
-    console.log('YOU LOOOSER!!!');
   }
 }
 
-
-
 function chooseMode(e) {
-  // const count = e ? +e.target.value : +modeSelect.getNode().value;
-  // if (count === 16) { mineCount.setMinMax(1, 230); }
-  // if (count === 10) { mineCount.setMinMax(1, 95); }
-  // if (count === 5) { mineCount.setMinMax(1, 20); }
   if (e) {
     mineCount.clearValue();
   }
 }
-
-
 
 modalButton.getNode().onclick = handleModal;
 closeModal.getNode().onclick = handleModal;
@@ -235,9 +259,6 @@ mineCount.getNode().addEventListener('input', (e) => {
   if (+node.value > node.max) {
     node.value = node.max;
   }
-  // if (+node.value < node.min) {
-  //   node.value = node.min;
-  // }
 });
 
 playGround.getNode().addEventListener('contextmenu', (e) => {
@@ -248,11 +269,22 @@ theme.getNode().addEventListener('mousedown', () => {
   isDark = !isDark;
   handleDarkMode();
   localStorage.setItem('theme', isDark);
-})
+});
+
+soundSwitch.getNode().addEventListener('mousedown', () => {
+  soundSwitch.getNode().classList.toggle('sound-switch_off');
+  if (audio.volume) {
+    audio.volume = 0;
+    return;
+  }
+  audio.volume = 0.5;
+});
 
 window.addEventListener('beforeunload', () => {
   saveGame();
-})
+});
+
+loadGame();
 
 console.log();
 

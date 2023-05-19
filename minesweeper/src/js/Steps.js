@@ -5,7 +5,7 @@ export default class Steps extends BaseComponent {
 
   updateStep() {
     this.#steps += 1;
-    this.getNode().textContent = `Steps: ${this.#steps}`;
+    this.getNode().textContent = `Moves: ${this.#steps}`;
   }
 
   set steps(num) {

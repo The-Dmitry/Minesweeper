@@ -21,10 +21,10 @@ export default class Input extends BaseComponent {
       this.getNode().add(option);
     });
   }
-  
+
   setMinMax(min, max) {
     const node = this.getNode();
-    node.placeholder = `Max: ${max}`;
+    node.placeholder = `Max mines: ${max}`;
     node.min = min;
     node.max = max;
   }

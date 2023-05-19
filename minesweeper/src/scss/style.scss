@@ -2,7 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap');
 
 $width: 900px;
-$color: black;
 
 html {
   height: 100%;
@@ -18,9 +17,27 @@ body {
   gap: 20px;
   height: 100%;
   font-family: 'Mukta', sans-serif;
-  transition: background-color linear .3s;
 }
 
+.cell {
+  appearance: none;
+  border: none;
+  outline: none;
+  background-color: #f4d33a;
+  aspect-ratio: 1 / 1;
+  font-size: 150%;
+  font-weight: 700;
+  transition: background-color linear .3s;
+  -webkit-box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
+  -moz-box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
+  box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
+  &:disabled {
+    background-color: #fff2a3;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+}
 
 .playground {
   order: 2;
@@ -32,6 +49,15 @@ body {
   -webkit-box-shadow: 4px 4px 8px 4px rgba(34, 60, 80, 0.4);
   -moz-box-shadow: 4px 4px 8px 4px rgba(34, 60, 80, 0.4);
   box-shadow: 4px 4px 8px 4px rgba(34, 60, 80, 0.4);
+  contain: inline-size;
+}
+
+.playground.size-25 {
+  @media (max-width: 750px) {
+    .cell {
+      font-size: 90%;
+    }
+  }
 }
 
 .select-mode {
@@ -135,25 +161,7 @@ body {
   max-width: 750px;
 }
 
-.cell {
-  appearance: none;
-  border: none;
-  outline: none;
-  background-color: #f4d33a;
-  aspect-ratio: 1 / 1;
-  font-size: 150%;
-  font-weight: 700;
-  transition: background-color linear .3s;
-  -webkit-box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
-  -moz-box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
-  box-shadow: -8px -8px 5px -5px rgba(7, 8, 9, 0.6) inset, 8px 8px 5px -5px rgba(255, 255, 255, 1) inset;
-  &:disabled {
-    background-color: #fff2a3;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-  }
-}
+
 
 .flag {
   background: url(../icons/flag.png) 0 0 / cover no-repeat;
@@ -177,7 +185,20 @@ body {
   transition: background-color linear .3s;
 }
 
+.sound-switch {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: url(../icons/sound.png) 0 0/ cover no-repeat;
+  border: none;
+  cursor: pointer;
+}
 
+.sound-switch_off {
+  background: url(../icons/sound-off.png) 0 0/ cover no-repeat;
+}
 
 
 .no-events-modal,
@@ -185,33 +206,41 @@ body {
   pointer-events: none;
 }
 
-.hidden {
-  display: none;
-}
+
 
 .result {
   width: fit-content;
+  font-size: 17px;
 }
 
 .result-list {
   width: fit-content;
   margin: 0 auto;
+  align-content: space-between;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 }
 
 .result-title {
   text-align: center;
   font-size: 25px;
+  margin-top: 20px;
 }
 
 .modal-parent {
   position: absolute;
+  display: flex;
+  flex-direction: column;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 95%;
   height: 70%;
   max-width: 950px;
-  background-color: rgba(0, 0, 0, 0.684);
+  background-color: rgba(0, 0, 0, 0.946);
   border-radius: 15px;
   color: #ffff;
 }
@@ -280,7 +309,48 @@ body {
   color: #eda200;
 }
 
+.hidden {
+  display: none;
+}
 
+.final-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70%;
+  height: 70%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(9, 13, 25, 0.947);
+  border-radius: 15px;
+}
+
+.message {
+  color: #fff;
+  text-align: center;
+  font-size: 25px;
+
+}
+
+.close-message {
+  width: 160px;
+  height: 40px;
+  border-radius: 15px;
+  background-color: #a9a9a9;
+  transition: background-color linear .2s;
+  font-family: 'Mukta', sans-serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 24px;
+  cursor: pointer;
+  &:hover {
+    background-color: #dedef8;
+  }
+}
 
 
 body.dark {
@@ -307,7 +377,6 @@ body.dark {
   }
 
   .flag {
-
     background-color: #ffd300;
   }
 }
