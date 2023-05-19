@@ -1,8 +1,6 @@
 @import './normalize';
 @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap');
 
-$width: 900px;
-
 html {
   height: 100%;
 }
@@ -123,7 +121,6 @@ body {
   cursor: text;
 }
 
-
 .timer,
 .steps,
 .flag-count,
@@ -161,14 +158,11 @@ body {
   max-width: 750px;
 }
 
-
-
 .flag {
   background: url(../icons/flag.png) 0 0 / cover no-repeat;
   background-color: #85a8e5;
 }
 .control {
-  max-width: $width;
   order: 1;
   display: flex;
   width: 100%;
@@ -200,13 +194,10 @@ body {
   background: url(../icons/sound-off.png) 0 0/ cover no-repeat;
 }
 
-
 .no-events-modal,
 .no-events {
   pointer-events: none;
 }
-
-
 
 .result {
   width: fit-content;
@@ -351,7 +342,6 @@ body {
     background-color: #dedef8;
   }
 }
-
 
 body.dark {
   background: rgb(19,62,66);

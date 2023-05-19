@@ -28,7 +28,7 @@ const resultTitle = new BaseComponent({ tagName: 'h2', classNames: ['result-titl
 const resultList = new BaseComponent({ classNames: ['result-list'] });
 const modeSelect = new Input({ tagName: 'select', classNames: ['select-mode'], options: modes });
 const mineCount = new Input({ tagName: 'input', classNames: ['mines-count'], type: 'number' });
-const flagCount = new Flag({ classNames: ['flag-count'], textContent: 'Flags / Mines: 0' });
+const flagCount = new Flag({ classNames: ['flag-count'], textContent: 'Flags/Mines: 0' });
 const theme = new BaseComponent({ tagName: 'button', classNames: ['theme'] });
 const soundSwitch = new BaseComponent({ tagName: 'button', classNames: ['sound-switch'], parentNode: body });
 const message = new BaseComponent({ classNames: ['final-message'] });
@@ -89,7 +89,7 @@ function saveGame() {
   if (playGround.isGameStarted) {
     const data = {
       cellsCount: playGround.cellsCount,
-      bombsList: [...playGround.bombsList],
+      bombsList: [...playGround.getBombsList],
       timer: timer.seconds,
       steps: steps.steps,
       stepsArray,
@@ -103,6 +103,7 @@ function saveGame() {
   localStorage.removeItem('game');
 }
 
+// Get results from local storage and build node with them
 function showResultFromLs() {
   resultList.removeAllChildren();
 
@@ -121,6 +122,7 @@ function showResultFromLs() {
   resultList.getNode().innerHTML = resultString;
 }
 
+// Get saved game (if there is one), set all settings from local storage, start game.
 function loadGame() {
   const data = localStorage.getItem('game');
   const list = localStorage.getItem('results');
@@ -148,6 +150,7 @@ function loadGame() {
   flagCount.updateFlags();
 }
 
+// Build message node at the end of the game
 function showMessage(win, seconds, moves) {
   if (win) {
     const sec = parseInt(seconds % 60, 10).toString().padStart(2, 0);
@@ -166,13 +169,14 @@ function showMessage(win, seconds, moves) {
   }, 700);
 }
 
+// Show result of the game, play sound, set result to localStorage
 function showWin(win) {
   if (win) {
     const result = {
       time: timer.seconds,
       steps: steps.steps,
       mode: playGround.getColumns,
-      mines: playGround.bombsList.size,
+      mines: playGround.getBombsList.size,
     };
     resultArray.push(result);
     resultArray = resultArray.slice(-10);
@@ -201,6 +205,7 @@ function findRepeatedFlag(array, xy) {
   return result;
 }
 
+// Open the cell, mines placing after the first move, plant the flag, check win/defeat
 function openTheCell(e) {
   const { target } = e;
   if (!target.matches('.cell')) { return; }
@@ -241,18 +246,14 @@ function openTheCell(e) {
   }
 }
 
-function chooseMode(e) {
-  if (e) {
-    mineCount.clearValue();
-  }
-}
-
 modalButton.getNode().onclick = handleModal;
 closeModal.getNode().onclick = handleModal;
 
 newGame.getNode().addEventListener('mousedown', startNewGame);
 playGround.getNode().addEventListener('mousedown', openTheCell);
-modeSelect.getNode().addEventListener('change', chooseMode);
+modeSelect.getNode().addEventListener('change', () => {
+  mineCount.clearValue();
+});
 
 mineCount.getNode().addEventListener('input', (e) => {
   const node = e.target;
@@ -286,6 +287,4 @@ window.addEventListener('beforeunload', () => {
 
 loadGame();
 
-console.log();
-
-// Чтобы состояние игры сохранилось, нужно сделать хотя бы 1 ход
+console.log('1.Сохранение игры реализовано без кнопки. Игра сохранится при перезагрузке / закрытии страницы и начнётся с того же места, при открытии страницы \n2. Чтобы игра сохранилась, нужно сделать хотя бы 1 ход (состояние, когда вы УЖЕ проиграли - не сохраняется), в противном случае, после перезагрузки запустится дефолтное состояние 10х10 и 10 мин. \n3. Количество флагов ограничено количеством мин (это не противоречит тз)\nЕсли вы дочитали до этого места - хорошего вам дня!');

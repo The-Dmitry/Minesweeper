@@ -29,6 +29,7 @@ export default class Playground extends BaseComponent {
     this.#bombsCount = bombsCount;
   }
 
+  // Place cells on the playing field
   generatePlayground() {
     const limit = this.#columns;
     const array = [];
@@ -43,10 +44,10 @@ export default class Playground extends BaseComponent {
       array.push(temp);
       this.appendChildren(temp);
     }
-    this.#cellsList = array;
-    // console.log(this.#cellsList);
+    this.setCellsList = array;
   }
 
+  // Determine the cell numbers for the bomb
   defineBombs(x, y) {
     const arr = new Array(this.#cellsCount).fill(0).map((el, index) => index);
     for (let i = arr.length - 1; i > 0; i -= 1) {
@@ -56,7 +57,7 @@ export default class Playground extends BaseComponent {
       arr[j] = temp;
     }
     const result = new Set(arr.slice(0, this.#bombsCount));
-    const num = this.#cellsList[x][y].id;
+    const num = this.getCellsList[x][y].id;
     if (result.has(num)) {
       const basicLength = result.size;
       result.delete(num);
@@ -72,7 +73,7 @@ export default class Playground extends BaseComponent {
   }
 
   plantBombs() {
-    const list = this.#cellsList;
+    const list = this.getCellsList;
     for (let i = 0; i < list.length; i += 1) {
       list[i].forEach((item) => {
         if (this.#bombsList.has(item.id)) {
@@ -88,7 +89,7 @@ export default class Playground extends BaseComponent {
       this.defineBombs(+x, +y);
     }
     if (!this.isValid(x, y)) { return; }
-    const cell = this.#cellsList[x][y];
+    const cell = this.getCellsList[x][y];
     if (cell.getNode().disabled || cell.isFlag) { return; }
     if (cell.isBomb()) {
       cell.boom();
@@ -118,7 +119,7 @@ export default class Playground extends BaseComponent {
     for (let i = -1; i <= 1; i += 1) {
       for (let j = -1; j <= 1; j += 1) {
         if (this.isValid(x + i, y + j)) {
-          if (this.#cellsList[x + i][y + j].isBomb()) {
+          if (this.getCellsList[x + i][y + j].isBomb()) {
             count += 1;
           }
         }
@@ -128,8 +129,8 @@ export default class Playground extends BaseComponent {
   }
 
   isValid(x, y) {
-    const row = this.#cellsList.length - 1;
-    const column = this.#cellsList[0].length - 1;
+    const row = this.getCellsList.length - 1;
+    const column = this.getCellsList[0].length - 1;
     return (x >= 0 && x <= row) && (y >= 0 && y <= column);
   }
 
@@ -153,7 +154,9 @@ export default class Playground extends BaseComponent {
     this.getNode().classList.remove('no-events');
   }
 
-  loadGame({ cellsCount, bombsList, columns, stepsArray, flagArray }) {
+  loadGame({
+    cellsCount, bombsList, columns, stepsArray, flagArray,
+  }) {
     this.#cellsCount = cellsCount;
     this.#bombsList = new Set(bombsList);
     this.#columns = columns;
@@ -175,11 +178,11 @@ export default class Playground extends BaseComponent {
   }
 
   blowUpEverything(className) {
-    this.#cellsList.forEach((array) => array.forEach((cell) => {
+    this.getCellsList.forEach((array) => array.forEach((cell) => {
       if (cell.bomb) {
         cell.boom(className);
       }
-    }))
+    }));
   }
 
   get isLoose() {
@@ -187,7 +190,7 @@ export default class Playground extends BaseComponent {
   }
 
   setTheFlag(x, y) {
-    this.#cellsList[x][y].setTheFlag();
+    this.getCellsList[x][y].setTheFlag();
   }
 
   get isGameStarted() {
@@ -198,19 +201,19 @@ export default class Playground extends BaseComponent {
     this.#isGameStarted = bool;
   }
 
-  set cellsList(array) {
+  set setCellsList(array) {
     this.#cellsList = array;
   }
 
-  get cellsList() {
+  get getCellsList() {
     return this.#cellsList;
   }
 
-  get bombsList() {
+  get getBombsList() {
     return this.#bombsList;
   }
 
-  set bombsList(list) {
+  set setBombsList(list) {
     this.#bombsList = list;
   }
 
